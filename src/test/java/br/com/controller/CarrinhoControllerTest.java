@@ -6,6 +6,7 @@ import br.com.repository.CarrinhoRepository;
 import br.com.service.CarrinhoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -30,6 +31,14 @@ public class CarrinhoControllerTest {
 
     @Autowired
     private CarrinhoRepository repository;
+
+    @BeforeEach
+    public void truncateTable() {
+        repository.findById(1).ifPresent(p -> {
+            p.setQuantidade(10);
+            repository.save(p);
+        });
+    }
 
 
     @Test
@@ -128,6 +137,8 @@ public class CarrinhoControllerTest {
                 )
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
+        ProdutoEntity produto = repository.findById(1).get();
+        Assertions.assertEquals(10, produto.getQuantidade());
 
     }
 
